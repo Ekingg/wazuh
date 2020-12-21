@@ -615,6 +615,9 @@ STATIC void fim_link_check_delete(int pos) {
 
     if (w_stat(syscheck.symbolic_links[pos], &statbuf) < 0) {
         if (errno == ENOENT) {
+            if (syscheck.opts[pos] & WHODATA_ACTIVE) {
+                remove_audit_rule_syscheck(syscheck.symbolic_links[pos]);
+            }
             *syscheck.symbolic_links[pos] = '\0';
             return;
         }
@@ -626,7 +629,9 @@ STATIC void fim_link_check_delete(int pos) {
         if (syscheck.realtime && syscheck.realtime->dirtb) {
             fim_delete_realtime_watches(pos);
         }
-
+        if (syscheck.opts[pos] & WHODATA_ACTIVE) {
+            remove_audit_rule_syscheck(syscheck.symbolic_links[pos]);
+        }
         *syscheck.symbolic_links[pos] = '\0';
     }
 }
