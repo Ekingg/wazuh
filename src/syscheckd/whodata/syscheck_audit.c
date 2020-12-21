@@ -240,7 +240,7 @@ int add_audit_rules_syscheck(bool first_time) {
                         }
                     }
                 } else if (found == 1) {
-                    mdebug1(FIM_AUDIT_RELOADED, fim_get_real_path(i));
+                    mdebug1(FIM_AUDIT_RULEDUP, fim_get_real_path(i));
                 } else {
                     merror(FIM_ERROR_WHODATA_CHECK_RULE);
                 }
