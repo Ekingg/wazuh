@@ -32,6 +32,7 @@ Please fill the table above. Feel free to extend it at your convenience.
 - API tavern integration tests without failures. Updated and/or expanded if needed (`api/test/integration/`):
   - [ ] Affected tests 
   - [ ] Affected RBAC (black and white) tests
+- [ ] Review integration test mapping using the script (`api/test/integration/mapping/integration_test_api_endpoints.json`)
 - [ ] Review of spec.yaml examples and schemas (`api/api/spec/spec.yaml`)
 - [ ] Changelog (`CHANGELOG.md`)
 <!-- If changes are made to any of the following components, uncomment the corresponding line 
