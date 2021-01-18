@@ -233,7 +233,7 @@ int add_audit_rules_syscheck(bool first_time) {
                     if (retval = audit_add_rule(real_path, AUDIT_KEY), retval > 0) {
                         mdebug1(FIM_AUDIT_NEWRULE, real_path);
                         rules_added++;
-                    } else if (retval != -17) {
+                    } else if (retval != -EEXIST) {
                         if (first_time) {
                             mwarn(FIM_WARN_WHODATA_ADD_RULE, real_path);
                         } else {
@@ -1483,8 +1483,7 @@ int audit_health_check(int audit_socket) {
     audit_health_check_creation = 0;
     unsigned int timer = 10;
 
-     // -17 Means audit rule exist EEXIST
-    if(retval = audit_add_rule(AUDIT_HEALTHCHECK_DIR, AUDIT_HEALTHCHECK_KEY), retval <= 0 && retval != -17) {
+    if(retval = audit_add_rule(AUDIT_HEALTHCHECK_DIR, AUDIT_HEALTHCHECK_KEY), retval <= 0 && retval != -EEXIST) {
         mdebug1(FIM_AUDIT_HEALTHCHECK_RULE);
         return -1;
     }
