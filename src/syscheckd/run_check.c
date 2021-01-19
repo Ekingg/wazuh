@@ -424,7 +424,6 @@ void set_priority_windows_thread() {
 
 int fim_whodata_initialize() {
     int retval = 0;
-
 #if defined ENABLE_AUDIT || defined WIN32
 
 #ifdef WIN32
@@ -443,7 +442,9 @@ int fim_whodata_initialize() {
                 syscheck.realtime_change = 1;
             }
 #else // Whodata on Linux
-            realtime_adddir(fim_get_real_path(i), i + 1, (syscheck.opts[i] & CHECK_FOLLOW) ? 1 : 0);
+            char *real_path = fim_get_real_path(i);
+            realtime_adddir(real_path, i + 1, (syscheck.opts[i] & CHECK_FOLLOW) ? 1 : 0);
+            free(real_path);
 #endif
 
         }
@@ -605,8 +606,10 @@ STATIC void fim_link_update(int pos, char *new_path) {
     }
 #endif
 
+    w_mutex_lock(&syscheck.fim_symlink_mutex);
     os_free(syscheck.symbolic_links[pos]);
     os_strdup(new_path, syscheck.symbolic_links[pos]);
+    w_mutex_unlock(&syscheck.fim_symlink_mutex);
 
     // Add new entries without alert.
     fim_link_silent_scan(new_path, pos);

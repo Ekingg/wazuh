@@ -916,7 +916,7 @@ void fim_diff_folder_size();
  * configured in syscheck.symbolic_links or not.
  *
  * @param position Position of the directory in the structure
- * @return syscheck.symbolic_links[position] if not NULL, syscheck.dir[position] otherwise
+ * @return A copy of syscheck.symbolic_links[position] if not NULL, syscheck.dir[position] otherwise.
  */
 char *fim_get_real_path(int position);
 

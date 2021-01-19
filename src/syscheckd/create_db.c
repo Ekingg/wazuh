@@ -59,7 +59,7 @@ void fim_scan() {
     clock_t cputime_start;
     unsigned int nodes_count = 0;
     struct fim_element item;
-
+    char *real_path = NULL;
     cputime_start = clock();
     gettime(&start);
     minfo(FIM_FREQUENCY_STARTED);
@@ -77,14 +77,15 @@ void fim_scan() {
         memset(&item, 0, sizeof(fim_element));
         item.mode = FIM_SCHEDULED;
         item.index = it;
+        real_path = fim_get_real_path(it);
 
-        fim_checker(fim_get_real_path(it), &item, NULL, 1);
+        fim_checker(real_path, &item, NULL, 1);
 #ifndef WIN32
         if (syscheck.opts[it] & REALTIME_ACTIVE) {
-            realtime_adddir(fim_get_real_path(it), 0, (syscheck.opts[it] & CHECK_FOLLOW) ? 1 : 0);
+            realtime_adddir(real_path, 0, (syscheck.opts[it] & CHECK_FOLLOW) ? 1 : 0);
         }
 #endif
-
+        free(real_path);
         it++;
     }
 
@@ -111,8 +112,10 @@ void fim_scan() {
             memset(&item, 0, sizeof(fim_element));
             item.mode = FIM_SCHEDULED;
             item.index = it;
+            real_path = fim_get_real_path(it);
 
-            fim_checker(fim_get_real_path(it), &item, NULL, 0);
+            fim_checker(real_path, &item, NULL, 0);
+            free(real_path);
             it++;
         }
 
@@ -571,6 +574,7 @@ void fim_check_db_state() {
 int fim_configuration_directory(const char *path, const char *entry) {
     char full_path[OS_SIZE_4096 + 1] = {'\0'};
     char full_entry[OS_SIZE_4096 + 1] = {'\0'};
+    char *real_path = NULL;
     int it = 0;
     int top = 0;
     int match = 0;
@@ -584,9 +588,11 @@ int fim_configuration_directory(const char *path, const char *entry) {
 
     if (strcmp("file", entry) == 0) {
         while(syscheck.dir[it]) {
-            trail_path_separator(full_entry, fim_get_real_path(it), sizeof(full_entry));
+            real_path = fim_get_real_path(it);
+            trail_path_separator(full_entry, real_path, sizeof(full_entry));
             match = w_compare_str(full_entry, full_path);
 
+            free(real_path);
             if (top < match && full_path[match - 1] == PATH_SEP) {
                 position = it;
                 top = match;
@@ -606,12 +612,15 @@ int fim_check_depth(char * path, int dir_position) {
     char * pos;
     int depth = -1;
     unsigned int parent_path_size;
+    char *real_path = NULL;
 
     if (syscheck.dir[dir_position] == NULL && syscheck.symbolic_links[dir_position] == NULL) {
         return -1;
     }
 
-    parent_path_size = strlen(fim_get_real_path(dir_position));
+    real_path = fim_get_real_path(dir_position);
+    parent_path_size = strlen(real_path);
+    free(real_path);
 
     if (parent_path_size > strlen(path)) {
         return -1;
@@ -1214,7 +1223,14 @@ void fim_print_info(struct timespec start, struct timespec end, clock_t cputime_
 }
 
 char *fim_get_real_path(int position) {
-    return syscheck.symbolic_links[position] == NULL ? syscheck.dir[position] : syscheck.symbolic_links[position];
+    char *real_path = NULL;
+
+    w_mutex_lock(&syscheck.fim_symlink_mutex);
+    // The path us duplicated in order to avoid wrong paths when a symlink is updated.
+    os_strdup(syscheck.symbolic_links[position] == NULL ? syscheck.dir[position] : syscheck.symbolic_links[position], real_path);
+    w_mutex_unlock(&syscheck.fim_symlink_mutex);
+
+    return real_path;
 }
 
 // Sleep during rt_delay milliseconds
