@@ -1225,10 +1225,17 @@ void fim_print_info(struct timespec start, struct timespec end, clock_t cputime_
 char *fim_get_real_path(int position) {
     char *real_path = NULL;
 
+    // Avoid using symlink mutex in Windows
+#ifndef WIN32
     w_mutex_lock(&syscheck.fim_symlink_mutex);
     // The path us duplicated in order to avoid wrong paths when a symlink is updated.
+#endif
+
     os_strdup(syscheck.symbolic_links[position] == NULL ? syscheck.dir[position] : syscheck.symbolic_links[position], real_path);
+
+#ifndef WIN32
     w_mutex_unlock(&syscheck.fim_symlink_mutex);
+#endif
 
     return real_path;
 }
