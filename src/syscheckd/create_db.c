@@ -1228,13 +1228,18 @@ char *fim_get_real_path(int position) {
     // Avoid using symlink mutex in Windows
 #ifndef WIN32
     w_mutex_lock(&syscheck.fim_symlink_mutex);
-    // The path us duplicated in order to avoid wrong paths when a symlink is updated.
-#endif
 
-    os_strdup(syscheck.symbolic_links[position] == NULL ? syscheck.dir[position] : syscheck.symbolic_links[position], real_path);
+    //Create a safe copy of the path to be used by other threads.
+    if (syscheck.symbolic_links[position] == NULL) {
+        os_strdup(syscheck.dir[position], real_path);
+    } else {
+        os_strdup(syscheck.symbolic_links[position], real_path);
+    }
 
-#ifndef WIN32
     w_mutex_unlock(&syscheck.fim_symlink_mutex);
+
+#else //WIN32
+    os_strdup(syscheck.dir[position], real_path);
 #endif
 
     return real_path;
