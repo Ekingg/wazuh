@@ -16,8 +16,10 @@ for sh_file in /configuration_files/*.sh; do
   . $sh_file
 done
 
-# Start both old and new wazuh agents
-/var/ossec/bin/ossec-control start
-/var/ossec/bin/wazuh-control start
+if [ $3  == "4.x" ]; then
+  /var/ossec/bin/wazuh-control start
+else
+  /var/ossec/bin/ossec-control start
+fi
 
 tail -f /var/ossec/logs/ossec.log

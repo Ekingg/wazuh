@@ -57,7 +57,7 @@ services:
       context: .
       dockerfile: base/agent/Dockerfile
       args:
-        agent_branch: ${AGENT_BRANCH}
+        agent_branch: ${MANAGER_BRANCH}
     image: wazuh-agent
     hostname: wazuh-agent1
     entrypoint:
@@ -75,7 +75,7 @@ services:
       context: .
       dockerfile: base/agent/Dockerfile
       args:
-        agent_branch: ${AGENT_BRANCH}
+        agent_branch: ${MANAGER_BRANCH}
     image: wazuh-agent
     hostname: wazuh-agent2
     entrypoint:
@@ -94,7 +94,7 @@ services:
       context: .
       dockerfile: base/agent/Dockerfile
       args:
-        agent_branch: ${AGENT_BRANCH}
+        agent_branch: ${MANAGER_BRANCH}
     image: wazuh-agent
     hostname: wazuh-agent3
     entrypoint:
@@ -113,7 +113,7 @@ services:
       context: .
       dockerfile: base/agent/Dockerfile
       args:
-        agent_branch: ${AGENT_BRANCH}
+        agent_branch: ${MANAGER_BRANCH}
     image: wazuh-agent
     hostname: wazuh-agent4
     entrypoint:
