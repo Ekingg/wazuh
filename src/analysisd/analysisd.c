@@ -262,7 +262,7 @@ static void help_analysisd(void)
     print_out("    -u <user>   User to run as (default: %s)", USER);
     print_out("    -g <group>  Group to run as (default: %s)", GROUPGLOBAL);
     print_out("    -c <config> Configuration file to use (default: %s)", DEFAULTCPATH);
-    print_out("    -D <dir>    Directory to chroot into (default: %s)", DEFAULTDIR);
+    print_out("    -D <dir>    Directory to chroot into (default: %s)", DEFAULTDIR(NULL));
     print_out(" ");
     exit(1);
 }
@@ -274,7 +274,7 @@ int main(int argc, char **argv)
 {
     int c = 0, m_queue = 0, test_config = 0, run_foreground = 0;
     int debug_level = 0;
-    const char *dir = DEFAULTDIR;
+    const char *dir = DEFAULTDIR(NULL);
     const char *user = USER;
     const char *group = GROUPGLOBAL;
     uid_t uid;
